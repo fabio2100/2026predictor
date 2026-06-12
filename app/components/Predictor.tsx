@@ -326,7 +326,6 @@ export default function Predictor() {
   const [savedPredictions, setSavedPredictions] = useState<Record<number, Prediction>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle')
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const fetchMatches = useCallback(async () => {
@@ -375,15 +374,12 @@ export default function Predictor() {
   }, [matches, fetchMatches])
 
   const handlePrediction = (matchId: number, prediction: Prediction) => {
-    setPredictions((prev) => ({ ...prev, [matchId]: prediction }))
-    setSaveStatus('idle')
-  }
-
-  const handleSave = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(predictions))
-    setSavedPredictions({ ...predictions })
-    setSaveStatus('saved')
-    setTimeout(() => setSaveStatus('idle'), 2500)
+    setPredictions((prev) => {
+      const updated = { ...prev, [matchId]: prediction }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      setSavedPredictions(updated)
+      return updated
+    })
   }
 
   // ── Points calculation ──────────────────────────────────────────────────────
@@ -483,37 +479,23 @@ export default function Predictor() {
       </div>
 
       {/* Actions bar */}
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div className="text-sm text-zinc-500 dark:text-zinc-400">
-          {totalPredictions > 0 ? (
-            <span>
-              {totalPredictions} pronóstico{totalPredictions !== 1 ? 's' : ''} registrado{totalPredictions !== 1 ? 's' : ''}
-            </span>
-          ) : (
-            <span>Seleccioná tus pronósticos</span>
-          )}
-          {lastUpdated && (
-            <span className="ml-2 text-zinc-400 dark:text-zinc-600 text-xs">
-              · Actualizado{' '}
-              {lastUpdated.toLocaleTimeString('es-AR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
-          )}
-        </div>
-
-        <button
-          onClick={handleSave}
-          disabled={totalPredictions === 0}
-          className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed ${
-            saveStatus === 'saved'
-              ? 'bg-emerald-500 text-white scale-95'
-              : 'bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200'
-          }`}
-        >
-          {saveStatus === 'saved' ? '✓ Guardado' : 'Guardar pronósticos'}
-        </button>
+      <div className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+        {totalPredictions > 0 ? (
+          <span>
+            {totalPredictions} pronóstico{totalPredictions !== 1 ? 's' : ''} registrado{totalPredictions !== 1 ? 's' : ''}
+          </span>
+        ) : (
+          <span>Seleccioná tus pronósticos</span>
+        )}
+        {lastUpdated && (
+          <span className="ml-2 text-zinc-400 dark:text-zinc-600 text-xs">
+            · Actualizado{' '}
+            {lastUpdated.toLocaleTimeString('es-AR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        )}
       </div>
 
       {/* Matches */}
