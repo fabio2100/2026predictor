@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 
 type MatchStatus =
   | 'SCHEDULED'
@@ -117,9 +117,10 @@ interface MatchCardProps {
   prediction: Prediction | undefined
   savedPrediction: Prediction | undefined
   onPredict: (matchId: number, prediction: Prediction) => void
+  ref?: React.RefObject<HTMLDivElement>
 }
 
-function MatchCard({ match, prediction, savedPrediction, onPredict }: MatchCardProps) {
+function MatchCard({ match, prediction, savedPrediction, onPredict, ref }: MatchCardProps) {
   const editable = isEditable(match.status)
   const result = getActualResult(match)
   const knockout = isKnockoutStage(match.stage)
@@ -165,7 +166,7 @@ function MatchCard({ match, prediction, savedPrediction, onPredict }: MatchCardP
     : 'bg-white dark:bg-zinc-900'
 
   return (
-    <div className={`rounded-xl border ${cardBorder} ${cardBg} p-4 transition-colors`}>
+    <div ref={ref} className={`rounded-xl border ${cardBorder} ${cardBg} p-4 transition-colors`}>
       {/* Header row */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span
@@ -382,6 +383,18 @@ export default function Predictor() {
     })
   }
 
+  // ── Ref for first non-finished match ────────────────────────────────────────
+  const firstNonFinishedRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to first non-finished match when matches load
+  useEffect(() => {
+    if (firstNonFinishedRef.current && !loading) {
+      setTimeout(() => {
+        firstNonFinishedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [loading])
+
   // ── Points calculation ──────────────────────────────────────────────────────
   const finishedMatches = matches.filter((m) => m.status === 'FINISHED')
   const predictedFinished = finishedMatches.filter(
@@ -401,6 +414,9 @@ export default function Predictor() {
     acc[key].push(match)
     return acc
   }, {})
+
+  // ── Find first non-finished match ───────────────────────────────────────────
+  const firstNonFinishedMatchId = matches.find((m) => m.status !== 'FINISHED')?.id
 
   // ── Loading state ───────────────────────────────────────────────────────────
   if (loading) {
@@ -516,6 +532,7 @@ export default function Predictor() {
                     prediction={predictions[match.id]}
                     savedPrediction={savedPredictions[match.id]}
                     onPredict={handlePrediction}
+                    ref={match.id === firstNonFinishedMatchId ? firstNonFinishedRef : undefined}
                   />
                 ))}
               </div>
@@ -539,6 +556,7 @@ export default function Predictor() {
                     prediction={predictions[match.id]}
                     savedPrediction={savedPredictions[match.id]}
                     onPredict={handlePrediction}
+                    ref={match.id === firstNonFinishedMatchId ? firstNonFinishedRef : undefined}
                   />
                 ))}
               </div>
