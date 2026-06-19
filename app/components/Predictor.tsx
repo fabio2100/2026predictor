@@ -118,9 +118,10 @@ interface MatchCardProps {
   savedPrediction: Prediction | undefined
   onPredict: (matchId: number, prediction: Prediction) => void
   ref?: React.RefObject<HTMLDivElement | null>
+  isFirstNonFinished?: boolean
 }
 
-function MatchCard({ match, prediction, savedPrediction, onPredict, ref }: MatchCardProps) {
+function MatchCard({ match, prediction, savedPrediction, onPredict, ref, isFirstNonFinished }: MatchCardProps) {
   const editable = isEditable(match.status)
   const result = getActualResult(match)
   const knockout = isKnockoutStage(match.stage)
@@ -166,7 +167,7 @@ function MatchCard({ match, prediction, savedPrediction, onPredict, ref }: Match
     : 'bg-white dark:bg-zinc-900'
 
   return (
-    <div ref={ref} className={`rounded-xl border ${cardBorder} ${cardBg} p-4 transition-colors`}>
+    <div ref={ref} className={`rounded-xl border ${cardBorder} ${cardBg} p-4 transition-colors ${isFirstNonFinished ? 'scroll-mt-64' : ''}`}>
       {/* Header row */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span
@@ -482,7 +483,7 @@ export default function Predictor() {
   return (
     <div>
       {/* Score board */}
-      <div className="mb-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-6 text-white text-center shadow-lg">
+      <div className="sticky top-2 z-50 mb-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-6 text-white text-center shadow-lg">
         <p className="text-xs font-semibold uppercase tracking-widest opacity-75 mb-1">
           Tu puntaje
         </p>
@@ -533,6 +534,7 @@ export default function Predictor() {
                     savedPrediction={savedPredictions[match.id]}
                     onPredict={handlePrediction}
                     ref={match.id === firstNonFinishedMatchId ? firstNonFinishedRef : undefined}
+                    isFirstNonFinished={match.id === firstNonFinishedMatchId}
                   />
                 ))}
               </div>
@@ -557,6 +559,7 @@ export default function Predictor() {
                     savedPrediction={savedPredictions[match.id]}
                     onPredict={handlePrediction}
                     ref={match.id === firstNonFinishedMatchId ? firstNonFinishedRef : undefined}
+                    isFirstNonFinished={match.id === firstNonFinishedMatchId}
                   />
                 ))}
               </div>
