@@ -470,10 +470,12 @@ export default function Predictor() {
         <p className="text-xs font-semibold uppercase tracking-widest opacity-75 mb-1">
           Tu puntaje
         </p>
-        <p className="text-6xl font-black tabular-nums leading-none">{points}</p>
-        <p className="text-sm opacity-80 mt-2">
+        <p className="text-6xl font-black tabular-nums leading-none">
+          {predictedFinished.length > 0 ? `${points} - ${predictedFinished.length - points}` : '0 - 0'}
+        </p>
+        <p className="text-2xl opacity-80 mt-2">
           {predictedFinished.length > 0
-            ? `${points} acierto${points !== 1 ? 's' : ''} de ${predictedFinished.length} partido${predictedFinished.length !== 1 ? 's' : ''} finalizado${predictedFinished.length !== 1 ? 's'  : ''}`
+            ? `${((points / predictedFinished.length)).toFixed(3)}`
             : 'Los partidos finalizados mostrarán tus puntos aquí'}
         </p>
       </div>
