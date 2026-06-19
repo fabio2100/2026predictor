@@ -416,10 +416,20 @@ export default function Predictor() {
     return acc
   }, {})
 
-  // ── Find first non-finished match ───────────────────────────────────────────
   const firstNonFinishedMatchId = matches.find((m) => m.status !== 'FINISHED')?.id
+  // ── Score board background color ───────────────────────────────────────────
+  const misses = predictedFinished.length - points
+  let scoreBoardBg = 'from-emerald-500 to-teal-700'
+  if (predictedFinished.length > 0) {
+    if (points === misses) {
+      scoreBoardBg = 'from-amber-400 to-amber-600'
+    } else if (misses > points) {
+      scoreBoardBg = 'from-rose-500 to-red-700'
+    }
+  }
 
-  // ── Loading state ───────────────────────────────────────────────────────────
+
+  // ── Main render ─────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -483,7 +493,7 @@ export default function Predictor() {
   return (
     <div>
       {/* Score board */}
-      <div className="sticky top-2 z-50 mb-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-6 text-white text-center shadow-lg">
+      <div className={`sticky top-2 z-50 mb-6 rounded-2xl bg-gradient-to-br ${scoreBoardBg} p-6 text-white text-center shadow-lg`}>
         <p className="text-xs font-semibold uppercase tracking-widest opacity-75 mb-1">
           Tu puntaje
         </p>
