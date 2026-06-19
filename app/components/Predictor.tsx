@@ -117,7 +117,7 @@ interface MatchCardProps {
   prediction: Prediction | undefined
   savedPrediction: Prediction | undefined
   onPredict: (matchId: number, prediction: Prediction) => void
-  ref?: React.RefObject<HTMLDivElement>
+  ref?: React.RefObject<HTMLDivElement | null>
 }
 
 function MatchCard({ match, prediction, savedPrediction, onPredict, ref }: MatchCardProps) {
