@@ -505,6 +505,17 @@ export default function Predictor() {
             ? `${((points / predictedFinished.length)).toFixed(3)}`
             : 'Los partidos finalizados mostrarán tus puntos aquí'}
         </p>
+        <div className="mt-4">
+          <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+            <div 
+              className="bg-white h-full transition-all duration-300"
+              style={{ width: `${(finishedMatches.length / 104) * 100}%` }}
+            />
+          </div>
+          <p className="text-sm font-semibold mt-2 opacity-90">
+            {finishedMatches.length}/104 partidos finalizados ({((finishedMatches.length / 104) * 100).toFixed(1)}%)
+          </p>
+        </div>
       </div>
 
       {/* Actions bar */}
